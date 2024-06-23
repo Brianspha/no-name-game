@@ -28,16 +28,16 @@ impl StructHashImpl of StructHash<Message> {
         hash_state.update_with(MESSAGE_TYPE_HASH).update_with(*self).finalize()
     }
 }
+
 #[starknet::interface]
 pub trait IGame<TContractState> {
     fn play(ref self: TContractState);
-        fn submit_score(ref self: TContractState, score: u256, collected: u32);
-    fn submit_score_v2(ref self: TContractState, score: u256, collected: u32,nonce: felt252,
-        expiry: u64,
-        signature: Array<felt252>);
+    fn submit_score(ref self: TContractState, score: u256, collected: u32);
+    fn submit_score_v2(ref self: TContractState, score: u256, collected: u32, nonce: felt252,
+        expiry: u64, signature: Array<felt252>);
     fn whitelist_player(ref self: TContractState, player: ContractAddress);
     fn blacklist_player(ref self: TContractState, player: ContractAddress);
-    fn set_token_config(ref self: TContractState, play_token: ContractAddress, nft_token: ContractAddress,prize_pool:Array<PoolPrize>);
+    fn set_token_config(ref self: TContractState, play_token: ContractAddress, nft_token: ContractAddress, prize_pool: Array<PoolPrize>);
     fn get_player(ref self: TContractState, player: ContractAddress) -> Player;
     fn set_play_cost(ref self: TContractState, cost: u256);
     fn game_configured(ref self: TContractState) -> bool;
@@ -51,7 +51,7 @@ mod Game {
     use array::ArrayTrait;
     use result::ResultTrait;
     use option::OptionTrait;
-    use starknet_game::game::models::{Player, Prize, PlayToken,PoolPrize};
+    use starknet_game::game::models::{Player, Prize, PlayToken, PoolPrize};
     use openzeppelin::access::ownable::OwnableComponent;
     use openzeppelin::token::erc20::ERC20Component;
     use openzeppelin::token::erc721::ERC721Component;
@@ -72,7 +72,7 @@ mod Game {
     #[abi(embed_v0)]
     impl OwnableMixinImpl = OwnableComponent::OwnableMixinImpl<ContractState>;
     impl OwnableInternalImpl = OwnableComponent::InternalImpl<ContractState>;
-   #[abi(embed_v0)]
+    #[abi(embed_v0)]
     impl NoncesImpl = NoncesComponent::NoncesImpl<ContractState>;
     impl NoncesInternalImpl = NoncesComponent::InternalImpl<ContractState>;
 
@@ -96,9 +96,9 @@ mod Game {
         nft_token: ContractAddress,
         #[substorage(v0)]
         ownable: OwnableComponent::Storage,
-        prize_pool:LegacyMap<u32, PoolPrize>,
-        prize_pool_length:u32,
-         #[substorage(v0)]
+        prize_pool: LegacyMap<u32, PoolPrize>,
+        prize_pool_length: u32,
+        #[substorage(v0)]
         nonces: NoncesComponent::Storage,
     }
 
@@ -125,7 +125,8 @@ mod Game {
         let owner = get_caller_address();
         self.ownable.initializer(owner);
     }
- /// Required for hash computation.
+
+    /// Required for hash computation.
     impl SNIP12MetadataImpl of SNIP12Metadata {
         fn name() -> felt252 {
             'Game'
@@ -134,9 +135,9 @@ mod Game {
             'v1'
         }
     }
+
     #[abi(embed_v0)]
     impl GameImpl of super::IGame<ContractState> {
-
         fn play(ref self: ContractState) {
             let player_sender = get_caller_address();
             let play_token = IERC20Dispatcher { contract_address: self.play_token.read() };
@@ -144,10 +145,10 @@ mod Game {
             assert(self.game_configured(), Errors::GAME_NOT_CONFIGURED);
             let existing_player = self.player_info.read(player_sender);
             assert(!self.player_blacklisted(player_sender), Errors::PLAYER_BLACKLISTED);
-            let current_block:u256 = get_block_number().into();
+            let current_block: u256 = get_block_number().into();
             let play_token_instance = PlayToken {
                 owner: player_sender,
-                expiry:  current_block+ 86400, // @dev valid for one day
+                expiry: current_block + 86400, // @dev valid for one day
             };
 
             let balance = play_token.balance_of(player_sender);
@@ -192,8 +193,8 @@ mod Game {
 
         fn set_token_config(ref self: ContractState, play_token: ContractAddress, nft_token: ContractAddress, prize_pool: Array<PoolPrize>) {
             self.ownable.assert_only_owner();
-            let length =prize_pool.len().into();
-            assert( length> 0, Errors::INVALID_PRIZE_POOL);
+            let length = prize_pool.len().into();
+            assert(length > 0, Errors::INVALID_PRIZE_POOL);
             self.play_token.write(play_token);
             self.nft_token.write(nft_token);
             let mut index = 0;
@@ -201,12 +202,13 @@ mod Game {
                 if index == length {
                     break;
                 }
-                self.prize_pool.write(index,*prize_pool.at(index));
+                self.prize_pool.write(index, *prize_pool.at(index));
                 index += 1;
             };
-            self.prize_pool_length.write( self.prize_pool_length.read()+ length);
+            self.prize_pool_length.write(self.prize_pool_length.read() + length);
         }
-     fn submit_score(ref self: ContractState, score: u256, collected: u32) {
+
+        fn submit_score(ref self: ContractState, score: u256, collected: u32) {
             let player_sender = get_caller_address();
             let player = self.player_info.read(player_sender);
             if player.active && !player.blacklisted {
@@ -230,8 +232,8 @@ mod Game {
                     play_token: player.play_token,
                 });
                 let length = self.prize_pool_length.read();
-                let mut range_index:u32 =0;
-                let mut index:u32 = 0;
+                let mut range_index: u32 = 0;
+                let mut index: u32 = 0;
                 loop {
                     if range_index == collected {
                         break;
@@ -245,28 +247,28 @@ mod Game {
                         token.transfer(player_sender, prize.amount);
                     }
                     index %= length;
-                    range_index+=1;
-                }; 
+                    range_index += 1;
+                };
             }
         }
-        fn submit_score_v2(ref self: ContractState, score: u256, collected: u32,nonce: felt252,
-        expiry: u64,
-        signature: Array<felt252>) {
+
+        fn submit_score_v2(ref self: ContractState, score: u256, collected: u32, nonce: felt252,
+        expiry: u64, signature: Array<felt252>) {
             let player_sender = get_caller_address();
             let player = self.player_info.read(player_sender);
-  
-            let message=Message { recipient: player_sender, amount: score, nonce, expiry };
-              let owner = self.ownable.owner();
+            let message = Message { recipient: player_sender, amount: score, nonce, expiry };
+            let owner = self.ownable.owner();
+
             // Check and increase nonce
             self.nonces.use_checked_nonce(owner, message.nonce);
             let hash = message.get_message_hash(owner);
 
             let is_valid_signature_felt = DualCaseAccount { contract_address: owner }
-            .is_valid_signature(hash, signature);
+                .is_valid_signature(hash, signature);
 
             // Check either 'VALID' or True for backwards compatibility
             let is_valid_signature = is_valid_signature_felt == starknet::VALIDATED
-            || is_valid_signature_felt == 1;
+                || is_valid_signature_felt == 1;
             assert(is_valid_signature, Errors::INVALID_SIGNATURE);
             if player.active {
                 self.player_info.write(player_sender, Player {
@@ -290,7 +292,7 @@ mod Game {
                 });
             }
         }
-   
+
         fn whitelist_player(ref self: ContractState, player: ContractAddress) {
             self.ownable.assert_only_owner();
             let player_info = self.player_info.read(player);
