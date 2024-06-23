@@ -4,16 +4,18 @@
 This is a Proof of Concept (POC) Game that interacts with Cairo contracts for distributing in game rewards and keeping track of player scores.
 
 ## Badges  
+
 [![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](https://choosealicense.com/licenses/mit/)  
 
 ## Rewards
 
 With each play session, a player is given a specified time (e.g., three minutes) to move around the map collecting items that match their color. Collecting non-matching items decreases their size and remaining time, while matching items reward extra time and possibly one of the following:
+
 - NFT
 - Token
 
-
 ### Blacklisting or Whitelisting
+
 Players can be blacklisted or whitelisted by the admin based on defined criteria.
 
 ## Screenshots  
@@ -27,16 +29,22 @@ Players can be blacklisted or whitelisted by the admin based on defined criteria
 
 ## Tech Stack  
 
-![JavaScript](https://img.shields.io/badge/JavaScript-%23323330.svg?style=for-the-badge&logo=javascript&logoColor=%23F7DF1E) 
-![Vue.js](https://img.shields.io/badge/Vue.js-%2335495e.svg?style=for-the-badge&logo=vuedotjs&logoColor=%234FC08D) 
+![JavaScript](https://img.shields.io/badge/JavaScript-%23323330.svg?style=for-the-badge&logo=javascript&logoColor=%23F7DF1E)
+![Vue.js](https://img.shields.io/badge/Vue.js-%2335495e.svg?style=for-the-badge&logo=vuedotjs&logoColor=%234FC08D)
 ![Vuetify](https://img.shields.io/badge/Vuetify-1867C0?style=for-the-badge&logo=vuetify&logoColor=AEDDFF)  
-![Cairo](https://img.shields.io/badge/Cairo-2674E5?style=for-the-badge&logo=cairo&logoColor=white)     
-![Foundry](https://img.shields.io/badge/Foundry-yellow?style=for-the-badge&logo=fondry-rs&logoColor=white) 
-![Vite](https://img.shields.io/badge/Vite-FF6C37?style=for-the-badge&logo=vite&logoColor=white) 
+![Cairo](https://img.shields.io/badge/Cairo-2674E5?style=for-the-badge&logo=cairo&logoColor=white)
+![Foundry](https://img.shields.io/badge/Foundry-yellow?style=for-the-badge&logo=fondry-rs&logoColor=white)
+![Vite](https://img.shields.io/badge/Vite-FF6C37?style=for-the-badge&logo=vite&logoColor=white)
 
+## Setup
+
+Please ensure you install the neccesarry components for testing any cairo contract see: <a href="https://book.starknet.io/ch02-01-basic-installation.html">Starknet Documentation</a>
+Also ensure you have <a href="https://www.docker.com/products/docker-desktop/"> Docker</a> installed
 
 ## Run Locally  
+
 See Packages folder for individual project instructions. For contract see make file
+
 ## Acknowledgements  
 
 - [Awesome Readme Templates](https://awesomeopensource.com/project/elangosundar/awesome-README-templates)
@@ -46,5 +54,3 @@ See Packages folder for individual project instructions. For contract see make f
 ## Feedback  
 
 If you have any feedback, please create an issue and tag me.
-
-

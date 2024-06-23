@@ -16,3 +16,7 @@ fix_typos:
 
 deploy:
 	@sncast --url http://127.0.0.1:5050 script run game_script
+
+run_local_node:
+	@docker pull shardlabs/starknet-devnet:latest;
+	@docker run -p 5050:5050 shardlabs/starknet-devnet:latest --seed 0
