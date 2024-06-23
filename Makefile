@@ -13,3 +13,6 @@ lint:
 
 fix_typos:
 	@typos -w
+
+deploy:
+	@sncast --url http://127.0.0.1:5050 script run game_script
